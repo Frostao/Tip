@@ -17,6 +17,9 @@ class ViewController: UIViewController {
     @IBOutlet weak var percentSelect: UISegmentedControl!
     var fullScreenConstraint:NSLayoutConstraint?
     
+    var currentcyType:String = "$"
+    
+    
     
     @IBAction func valueChanged(sender: AnyObject) {
         if totalAmount.text != "" {
@@ -36,8 +39,13 @@ class ViewController: UIViewController {
         }
     }
     
+    func setCurrencyType(currentcy: String) {
+        currentcyType = currentcy
+    }
+    
     
     func calculateTip() {
+        
         let total = Double(totalAmount.text!)
         var percent:Double = 0
         switch percentSelect.selectedSegmentIndex {
@@ -53,14 +61,22 @@ class ViewController: UIViewController {
         default:
             break
         }
-        tipLabel.text = "$\(total!*percent)"
-        totalLabel.text = "$\(total!*(1+percent))"
+        tipLabel.text = currentcyType+"\(total!*percent)"
+        totalLabel.text = currentcyType+"\(total!*(1+percent))"
+        storeTip(total!)
+    }
+    
+    func storeTip(tip:Double) {
+        let defaults = NSUserDefaults.standardUserDefaults()
+        defaults.setDouble(tip, forKey: "lastTip")
+        defaults.setObject(NSDate(), forKey: "lastTime")
+        defaults.synchronize()
     }
     
     
     override func viewWillAppear(animated: Bool) {
         totalAmount.becomeFirstResponder()
-        percentSelect.selectedSegmentIndex = 2
+        
     }
     
     override func viewDidLayoutSubviews() {
@@ -76,6 +92,31 @@ class ViewController: UIViewController {
     }
     override func viewDidAppear(animated: Bool) {
         
+        let defaults = NSUserDefaults.standardUserDefaults()
+        percentSelect.selectedSegmentIndex = 2
+        if let percent = defaults.objectForKey("defaultPercent") as? Double {
+            switch percent {
+            case 0.1:
+                percentSelect.selectedSegmentIndex = 0
+                break
+            case 0.15:
+                percentSelect.selectedSegmentIndex = 1
+                break
+            case 0.2:
+                percentSelect.selectedSegmentIndex = 2
+                break
+            default:
+                break
+            }
+        }
+        if let date = defaults.objectForKey("lastTime") as? NSDate {
+            let timeDiff = NSDate().timeIntervalSinceDate(date)
+            if timeDiff < 600 {
+                let lastTip = defaults.objectForKey("lastTip") as! Double
+                totalAmount.text = String(lastTip)
+                valueChanged(totalAmount)
+            }
+        }
         
     }
     override func viewDidLoad() {

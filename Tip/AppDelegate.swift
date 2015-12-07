@@ -34,11 +34,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func applicationWillEnterForeground(application: UIApplication) {
+        
         // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
     }
 
     func applicationDidBecomeActive(application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+        let locale = NSLocale.currentLocale()
+        if let currencyType = locale.objectForKey(NSLocaleCurrencyCode) as? String {
+            
+            if currencyType == "GBP" {
+                //v.setCurrencyType("£")
+                
+            } else {
+                //v.currentcyType = "$"
+            }
+            print(currencyType)
+            
+        }
+        
+        
+        
     }
 
     func applicationWillTerminate(application: UIApplication) {
