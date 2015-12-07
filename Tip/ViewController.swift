@@ -119,8 +119,34 @@ class ViewController: UIViewController {
         }
         
     }
+    
+    func localeChanged(notification: NSNotification) {
+        let currency = notification.object as! String
+        currentcyType = currency
+        totalAmount.placeholder = currentcyType
+        calculateTip()
+
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        let locale = NSLocale.currentLocale()
+        if let currencyType = locale.objectForKey(NSLocaleCurrencyCode) as? String {
+            
+            if currencyType == "GBP" {
+                currentcyType = "£"
+            } else {
+                currentcyType = "$"
+            }
+        }
+        totalAmount.placeholder = currentcyType
+        
+        
+        
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "localeChanged:", name: "localeChanged", object: nil)
+        
         
         // Do any additional setup after loading the view, typically from a nib.
     }
